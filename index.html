@@ -1,0 +1,98 @@
+ <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kasir Cemerlang</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🛒 Kasir Cemerlang</h1>
+
+<!-- 10 MENU MAKANAN & MINUMAN -->
+<div class="menu-grid">
+
+  <!-- 1 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Nasi Goreng', 15000)">
+    <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400" alt="Nasi Goreng">
+    <span>🍛 Nasi Goreng</span>
+    <strong>Rp15.000</strong>
+  </button>
+
+  <!-- 2 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Bakso', 13000)">
+    <img src="https://rri-portal-app-assets.obs.ap-southeast-4.myhuaweicloud.com/upload/berita/image/mamuju/1779697012690211_dfaa7e3944_berita_mamuju.webp" alt="Bakso">
+    <span>🍲 Bakso</span>
+    <strong>Rp13.000</strong>
+  </button>
+
+  <!-- 3 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Sate Ayam', 18000)">
+    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400" alt="Sate Ayam">
+    <span>🍢 Sate Ayam</span>
+    <strong>Rp18.000</strong>
+  </button>
+
+  <!-- 4 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Jus Alpukat', 10000)">
+    <img src="https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=400" alt="Jus Alpukat">
+    <span>🥑 Jus Alpukat</span>
+    <strong>Rp10.000</strong>
+  </button>
+
+  <!-- 5 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Soto Ayam', 15000)">
+    <img src="https://radarmukomuko.disway.id/upload/45c7207982826fe5035aba923655228f.jpg" alt="Soto Ayam">
+    <span>🍜 Soto Ayam</span>
+    <strong>Rp15.000</strong>
+  </button>
+
+  <!-- 6 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Gado-Gado', 12000)">
+    <img src="https://nutriscan.app/calories-nutrition/images/gado-gado-7ca3f.webp" alt="Gado-Gado">
+    <span>🥗 Gado-Gado</span>
+    <strong>Rp12.000</strong>
+  </button>
+
+  <!-- 7 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Martabak Telur', 15000)">
+    <img src="https://s3-ap-southeast-1.amazonaws.com/cntatr-assets-ap-southeast-1-250226768838-55a62c9399d4d8a6/2022/02/Martabak.jpg?tr=q-70%2Cc-at_max%2Cw-1000%2Ch-600" alt="Martabak">
+    <span>🥞 Martabak Telur</span>
+    <strong>Rp15.000</strong>
+  </button>
+
+  <!-- 8 -->
+  <button class="menu-btn" onclick="tambahKeKeranjang('Es Teh Manis', 3000)">
+    <img src="https://cdn.store.link/products/store11485/thqbgq-esteh.jpeg?versionId=oK8e58yZ2Se8TVW6odfofvaS6RLaAyXl" alt="Es Teh">
+    <span>🧋 Es Teh Manis</span>
+    <strong>Rp3.000</strong>
+  </button>
+
+
+
+</div>
+
+      <!-- Ringkasan total dan aksi bayar/reset -->
+      <div class="summary-box">
+        <h3>Total Tagihan:</h3>
+        <div id="total-harga" class="total-teks">Rp. 0</div>
+        <div class="action-btns">
+          <button id="btn-bayar" class="btn-main" disabled onclick="buatTransaksiQR()">Buat QR</button>
+          <button id="btn-reset" class="btn-reset" onclick="resetKeranjang()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Area tampil QR Code -->
+      <div id="qr-section" class="hidden">
+        <h3>ID: <span id="tx-id-display">-</span></h3>
+        <canvas id="qr-canvas"></canvas>
+        <div id="status-box" class="status-box status-pending">
+          Status: <strong id="status-teks">Menunggu scan pembayaran..</strong>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

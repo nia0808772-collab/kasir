@@ -1,0 +1,221 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f0f2f5;
+  height: 100dvh; /* Menggunakan Dynamic Viewport Height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.container {
+  width: 100%;
+  max-width: 380px;
+  max-height: 100dvh;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+h1 {
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+h3 {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+/* Grid Tombol Menu Ringkas */
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.menu-btn {
+  padding: 10px 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+}
+
+.menu-btn:active {
+  background: #e2e6ea;
+}
+
+/* Ringkasan Belanja Compact */
+.summary-box {
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 8px;
+  border: 1px solid #eee;
+}
+
+.total-teks {
+  font-size: 20px;
+  color: #007bff;
+  font-weight: bold;
+  margin: 2px 0 6px 0;
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-main {
+  flex: 2;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.btn-main:disabled {
+  background: #ccc;
+}
+
+.btn-reset {
+  flex: 1;
+  padding: 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Area QR Code Pas Layar */
+#qr-section {
+  border-top: 1px dashed #ccc;
+  padding-top: 8px;
+  text-align: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#qr-canvas {
+  width: 140px !important; /* Ukuran pas untuk HP agar tidak makan tempat */
+  height: 140px !important;
+  margin: 4px auto;
+  display: block;
+}
+
+/* Box Status Ringkas */
+.status-box {
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-success {
+  background: #d4edda;
+  color: #155724;
+  font-weight: bold;
+}
+
+ /* Reset tampilan */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container utama full layar */
+.container {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 15px;
+  border-radius: 0;
+}
+
+/* Menu 2 kolom */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  gap: 12px;
+}
+
+/* Kartu menu */
+.menu-btn {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Foto menu */
+.menu-btn img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Ringkasan pembayaran */
+.summary-box {
+  width: 100%;
+}
+
+/* Area QR */
+#qr-section {
+  width: 100%;
+  text-align: center;
+}
+
+#qr-canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tombol pembayaran */
+.action-btns {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.action-btns button {
+  flex: 1;
+  min-width: 0;
+}
