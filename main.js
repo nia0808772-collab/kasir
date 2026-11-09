@@ -27,6 +27,32 @@ let totalHarga = 0
 let trxIdSekarang = ""
 let unsubscribeListener = null
 
+ // FUNGSI SPEECH SYNTHESIS
+function suaraPembayaranBerhasil(nominal) {
+
+    if (!("speechSynthesis" in window)) {
+        console.log("Browser tidak mendukung Speech Synthesis")
+        return
+    }
+
+    // Hentikan suara sebelumnya
+    window.speechSynthesis.cancel()
+
+    const nominalRupiah = new Intl.NumberFormat("id-ID").format(nominal)
+
+    const ucapan = new SpeechSynthesisUtterance(
+        `Pembayaran berhasil! Uang sebesar ${nominalRupiah} rupiah telah diterima. Terima kasih sudah berbelanja di Kasir Cemerlang!`
+    )
+
+    // Pengaturan suara
+    ucapan.lang = "id-ID"
+    ucapan.rate = 0.9
+    ucapan.pitch = 1
+    ucapan.volume = 1
+
+    window.speechSynthesis.speak(ucapan)
+}
+
 // Fungsi tambah item ke keranjang
 window.tambahKeKeranjang = function (nama, harga) {
     // update total harga
@@ -111,30 +137,3 @@ function listenStatusPembayaran(trxId) {
     )
 }
 
- // =================================
-// SUARA PEMBAYARAN BERHASIL
-// =================================
-
-function suaraPembayaranBerhasil(nominal) {
-
-  if (!("speechSynthesis" in window)) {
-    console.log("Browser tidak mendukung suara");
-    return;
-  }
-
-  // Hentikan suara sebelumnya
-  window.speechSynthesis.cancel();
-
-  const harga = Number(nominal).toLocaleString("id-ID");
-
-  const ucapan = new SpeechSynthesisUtterance(
-    `Pembayaran berhasil! Uang sebesar ${harga} rupiah telah diterima. Terima kasih sudah berbelanja di Kasir Cemerlang!`
-  );
-
-  ucapan.lang = "id-ID";
-  ucapan.rate = 0.9;
-  ucapan.pitch = 1;
-  ucapan.volume = 1;
-
-  window.speechSynthesis.speak(ucapan);
-}
