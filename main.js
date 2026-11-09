@@ -1,12 +1,15 @@
+
 // 1. Impor module yang diperlukan dari firebase dan firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
 import {
     getFirestore,
     onSnapshot,
     doc,
-    setDoc
+    setDoc,
+    getDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
-import QRCode from "https://esm.sh/qrcode@1.5.3"
+import { Html5QrcodeScanner } from "https://esm.sh/html5-qrcode@2.3.8"
 
 // 2. Konfigurasi Firebase
 const firebaseConfig = {
@@ -18,16 +21,19 @@ const firebaseConfig = {
     appId: "1:643920833293:web:f5ac7fdc746e4e410d5e44"
 }
 
-// 3. Inisialisasi Firebase dan Firestore
+// 3. INISIALISASI FIREBASE
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
-// Kondisi/state aplikasi kasir
+
+// 4. STATE APLIKASI
 let totalHarga = 0
 let trxIdSekarang = ""
 let unsubscribeListener = null
+let transaksiTerakhirDiumumkan = ""
 
- // FUNGSI SPEECH SYNTHESIS
+
+// 5. FUNGSI SPEECH SYNTHESIS
 function suaraPembayaranBerhasil(nominal) {
 
     if (!("speechSynthesis" in window)) {
@@ -41,7 +47,7 @@ function suaraPembayaranBerhasil(nominal) {
     const nominalRupiah = new Intl.NumberFormat("id-ID").format(nominal)
 
     const ucapan = new SpeechSynthesisUtterance(
-        `Pembayaran berhasil! Uang sebesar ${nominalRupiah} rupiah telah diterima. Terima kasih sudah berbelanja di Kasir Cemerlang!`
+        `Pembayaran masuk! Uang sebesar ${nominalRupiah} rupiah telah diterima. Terima kasih sudah berbelanja`
     )
 
     // Pengaturan suara
@@ -53,87 +59,160 @@ function suaraPembayaranBerhasil(nominal) {
     window.speechSynthesis.speak(ucapan)
 }
 
-// Fungsi tambah item ke keranjang
-window.tambahKeKeranjang = function (nama, harga) {
-    // update total harga
+
+// 6. FUNGSI TAMBAH MENU
+window.tambahKeKeranjang = function(nama, harga) {
+
     totalHarga += harga
-    document.getElementById('total-harga').innerText = `Rp. ${totalHarga}`
 
-    // mengaktifkan tombol qr
-    document.getElementById('btn-bayar').disabled = false
+    document.getElementById("total-harga").innerText =
+        `Rp. ${totalHarga.toLocaleString("id-ID")}`
+
+    document.getElementById("btn-bayar").disabled = false
 }
 
-// Fungsi reset keranjang
-window.resetKeranjang = function () {
+
+// 7. FUNGSI RESET KERANJANG
+window.resetKeranjang = function() {
+
     totalHarga = 0
-    document.getElementById('total-harga').innerText = 'Rp. 0'
-    document.getElementById('btn-bayar').disabled = true
-    document.getElementById('qr-section').classList.add('hidden')
+
+    // Hentikan listener sebelumnya
+    if (unsubscribeListener) {
+        unsubscribeListener()
+        unsubscribeListener = null
+    }
+
+    document.getElementById("total-harga").innerText = "Rp. 0"
+
+    document.getElementById("btn-bayar").disabled = true
+
+    document.getElementById("qr-section").classList.add("hidden")
+
+    // Hentikan suara yang sedang berjalan
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel()
+    }
 }
 
-// Fungsi membuat ID transaksi dan QR Code
-window.buatTransaksiQR = async function () {
-    // mencegah transaksi 0 rupiah
+
+// 8. MEMBUAT TRANSAKSI QR
+window.buatTransaksiQR = async function() {
+
     if (totalHarga === 0) return
 
-    // buat identitas transaksi unik
+    // Hentikan listener transaksi sebelumnya
+    if (unsubscribeListener) {
+        unsubscribeListener()
+        unsubscribeListener = null
+    }
+
+    // Simpan nominal transaksi
+    const nominalTransaksi = totalHarga
+
+    // Buat ID transaksi
     trxIdSekarang = "TRX-" + Math.floor(1000 + Math.random() * 9000)
 
-    // tampilkan identitas transaksi
-    document.getElementById('tx-id-display').innerText = trxIdSekarang
-    // tampilkan qr-section (membuang class hidden)
-    document.getElementById('qr-section').classList.remove('hidden')
+    // Tampilkan ID
+    document.getElementById("tx-id-display").innerText = trxIdSekarang
 
-    // reset tampilan status QR
-    const statusBox = document.getElementById('status-box')
+    document.getElementById("qr-section").classList.remove("hidden")
+
+    // Status awal
+    const statusBox = document.getElementById("status-box")
+
     statusBox.className = "status-box status-pending"
-    document.getElementById('status-teks').innerText = "Menunggu scan..."
 
-    // membuat qrcode jelas terlihat
-    document.getElementById('qr-canvas').style.opacity = 1
+    document.getElementById("status-teks").innerText =
+        "Menunggu scan..."
 
-    // render QR Code ke canvas
-    const elemenCanvas = document.getElementById('qr-canvas')
+    document.getElementById("qr-canvas").style.opacity = 1
+
+    // Membuat QR Code
+    const elemenCanvas = document.getElementById("qr-canvas")
+
     try {
+
         await QRCode.toCanvas(elemenCanvas, trxIdSekarang, {
             width: 140,
             margin: 1
         })
+
     } catch (error) {
-        console.log("Gagal membuat QR")
+
+        console.error("Gagal membuat QR:", error)
+        return
     }
 
-    // simpan dokumen transaksi ke firestore
+    // Simpan transaksi ke Firestore
     const refTrx = doc(db, "transaksi", trxIdSekarang)
+
     try {
+
         await setDoc(refTrx, {
-            total: totalHarga,
-            status: 'takterbayar',
+            total: nominalTransaksi,
+            status: "takterbayar",
             waktuBuat: Date.now()
         })
+
     } catch (error) {
-        console.log("Gagal menyimpan transaksi ke firestore")
+
+        console.error("Gagal menyimpan transaksi:", error)
+        return
     }
 
-    listenStatusPembayaran(trxIdSekarang)
+    // Pantau status pembayaran
+    listenStatusPembayaran(trxIdSekarang, nominalTransaksi)
 }
 
-// Fungsi listener status pembayaran di firestore
-function listenStatusPembayaran(trxId) {
+
+// 9. LISTENER STATUS PEMBAYARAN
+function listenStatusPembayaran(trxId, nominal) {
+
     const refTrx = doc(db, "transaksi", trxId)
 
-    const unsubscribeListener = onSnapshot(
+    unsubscribeListener = onSnapshot(
         refTrx,
-        (docSnapshot) => {
-            if (docSnapshot.exists() && docSnapshot.data().status == 'terbayar') {
-                // tampilkan efek lunas
-                document.getElementById('status-box').className = "status-box status-success"
-                document.getElementById('status-teks').innerText = "🎉 LUNAS"
-                document.getElementById('qr-canvas').style.opacity = "0.2"
 
-                unsubscribeListener()
+        (docSnapshot) => {
+
+            if (!docSnapshot.exists()) return
+
+            const data = docSnapshot.data()
+
+            // CEK PEMBAYARAN BERHASIL
+            if (
+                data.status === "terbayar" &&
+                trxId !== transaksiTerakhirDiumumkan
+            ) {
+
+                // Tandai transaksi sudah diumumkan
+                transaksiTerakhirDiumumkan = trxId
+
+                // Tampilkan status lunas
+                document.getElementById("status-box").className =
+                    "status-box status-success"
+
+                document.getElementById("status-teks").innerText =
+                    "🎉 PEMBAYARAN BERHASIL!"
+
+                document.getElementById("qr-canvas").style.opacity = "0.2"
+
+                // PUTAR SUARA PEMBAYARAN
+                suaraPembayaranBerhasil(nominal)
+
+                console.log("Pembayaran berhasil:", trxId)
+
+                // Hentikan listener
+                if (unsubscribeListener) {
+                    unsubscribeListener()
+                    unsubscribeListener = null
+                }
             }
+        },
+
+        (error) => {
+            console.error("Gagal memantau pembayaran:", error)
         }
     )
 }
-
